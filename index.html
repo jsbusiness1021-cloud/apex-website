@@ -3,313 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Teleradiology | Provider CRM</title>
+    <title>Apex Teleradiology | Cloud CRM v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .glass-hover:hover { background: rgba(30, 41, 59, 0.9); transition: all 0.3s ease; }
-        .sidebar-link { transition: all 0.2s ease; }
-        .sidebar-link.active { background: rgba(99, 102, 241, 0.15); border-left: 4px solid #6366f1; color: #818cf8; }
         .status-badge { padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
         .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
         .status-recruiting { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .loading-shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
+    <!-- Config Overlay (Only shows if keys are missing) -->
+    <div id="setup-overlay" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center hidden">
+        <div class="glass p-10 rounded-3xl max-w-lg w-full text-center space-y-6">
+            <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="database" class="text-white w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold">Connect Your Database</h2>
+            <p class="text-slate-400 text-sm">To support 200+ employees, Apex CRM needs a cloud database. Please enter your Supabase details below.</p>
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Supabase URL</label>
+                    <input id="db-url" type="text" placeholder="https://xyz.supabase.co" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mt-1 text-sm outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Public API Key</label>
+                    <input id="db-key" type="password" placeholder="eyJhbG..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mt-1 text-sm outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="saveConfig()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-xl font-bold transition-all">Enable Cloud Sync</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="w-64 border-r border-slate-800 flex flex-col glass z-20">
         <div class="p-6">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
                     <i data-lucide="activity" class="text-white w-6 h-6"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">APEX</h1>
-                    <p class="text-[10px] text-slate-400 tracking-widest uppercase font-semibold">Teleradiology</p>
+                    <p class="text-[10px] text-slate-400 tracking-widest uppercase font-semibold">Cloud CRM</p>
                 </div>
             </div>
         </div>
-
         <nav class="flex-1 px-4 space-y-1 mt-4">
-            <a href="#" onclick="showView('dashboard')" class="sidebar-link active flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:text-white" id="nav-dashboard">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Dashboard</span>
+            <a href="#" onclick="showView('dashboard')" class="flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:bg-slate-800/50" id="nav-dashboard">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-sm">Dashboard</span>
             </a>
-            <a href="#" onclick="showView('directory')" class="sidebar-link flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:text-white" id="nav-directory">
-                <i data-lucide="users" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Provider Directory</span>
-            </a>
-            <a href="#" onclick="showView('pipeline')" class="sidebar-link flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:text-white" id="nav-pipeline">
-                <i data-lucide="git-pull-request" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Recruitment Pipeline</span>
-            </a>
-            <a href="#" onclick="showView('credentialing')" class="sidebar-link flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:text-white" id="nav-credentialing">
-                <i data-lucide="shield-check" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Credentialing</span>
-            </a>
-            <a href="#" onclick="showView('analytics')" class="sidebar-link flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:text-white" id="nav-analytics">
-                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Performance</span>
+            <a href="#" onclick="showView('directory')" class="flex items-center gap-3 p-3 rounded-lg text-slate-300 hover:bg-slate-800/50" id="nav-directory">
+                <i data-lucide="users" class="w-5 h-5"></i><span class="text-sm">Providers</span>
             </a>
         </nav>
-
         <div class="p-4 border-t border-slate-800">
-            <div class="bg-slate-900/50 rounded-xl p-3 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-slate-900">JS</div>
-                <div class="flex-1 overflow-hidden">
-                    <p class="text-xs font-semibold truncate">Admin User</p>
-                    <p class="text-[10px] text-slate-500 truncate">jsbusiness1021</p>
-                </div>
-                <button class="text-slate-500 hover:text-white"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+            <div id="sync-indicator" class="flex items-center gap-2 px-2 py-1 text-[10px] text-slate-500">
+                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                Cloud Connected
             </div>
         </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col min-w-0 bg-[#0b0f19]">
-        <!-- Top Bar -->
+    <main class="flex-1 flex flex-col min-w-0">
         <header class="h-16 border-b border-slate-800 flex items-center justify-between px-8 glass shrink-0">
-            <div class="flex items-center gap-4 flex-1">
-                <div class="relative w-96">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
-                    <input type="text" placeholder="Search providers, NPIs, specialties..." class="w-full bg-slate-900/50 border border-slate-700 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500 transition-colors">
-                </div>
+            <div class="relative w-96">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Search cloud database..." class="w-full bg-slate-900/50 border border-slate-700 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-indigo-500">
             </div>
-            <div class="flex items-center gap-6">
-                <button class="relative text-slate-400 hover:text-white">
-                    <i data-lucide="bell" class="w-5 h-5"></i>
-                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-indigo-500 rounded-full"></span>
-                </button>
-                <div class="h-8 w-px bg-slate-800"></div>
-                <button onclick="exportData()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    Export CSV
+            <div class="flex items-center gap-4">
+                <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-white"><i data-lucide="rotate-cw" class="w-5 h-5"></i></button>
+                <button onclick="openModal('add')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> New Provider
                 </button>
             </div>
         </header>
-
-        <!-- Dynamic Content Area -->
-        <div id="content-view" class="flex-1 overflow-y-auto p-8 space-y-8">
-            <!-- Content will be injected here -->
-        </div>
+        <div id="content-view" class="flex-1 overflow-y-auto p-8"></div>
     </main>
 
-    <script>
-        // Mock Data based on Apollo.io style
-        let providers = [
-            { id: 1, name: "Dr. Sarah Chen", specialty: "Neuroradiology", state: "CA", npi: "1234567890", status: "Active", source: "Apollo.io", email: "s.chen@example.com" },
-            { id: 2, name: "Dr. Michael Ross", specialty: "Musculoskeletal", state: "NY", npi: "9876543210", status: "Recruiting", source: "LinkedIn", email: "m.ross@example.com" },
-            { id: 3, name: "Dr. Elena Rodriguez", specialty: "Body Imaging", state: "TX", npi: "4567891230", status: "Pending", source: "Apollo.io", email: "e.rod@example.com" },
-            { id: 4, name: "Dr. James Wilson", specialty: "Pediatric Radiology", state: "FL", npi: "7890123456", status: "Active", source: "Referral", email: "j.wilson@example.com" },
-            { id: 5, name: "Dr. Linda Park", specialty: "Interventional", state: "IL", npi: "3216549870", status: "Recruiting", source: "Apollo.io", email: "l.park@example.com" }
-        ];
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center hidden">
+        <div class="glass p-8 rounded-3xl max-w-md w-full space-y-6">
+            <h2 class="text-xl font-bold" id="modal-title">Add New Provider</h2>
+            <div class="space-y-4">
+                <input id="m-name" type="text" placeholder="Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm">
+                <input id="m-specialty" type="text" placeholder="Specialty" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <input id="m-state" type="text" placeholder="State" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm">
+                    <input id="m-npi" type="text" placeholder="NPI" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm">
+                </div>
+                <select id="m-status" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm">
+                    <option value="Active">Active</option>
+                    <option value="Recruiting">Recruiting</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <div class="flex gap-3 pt-4">
+                <button onclick="closeModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-bold">Cancel</button>
+                <button id="modal-submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-bold">Save Provider</button>
+            </div>
+        </div>
+    </div>
 
-        function init() {
+    <script>
+        let supabase;
+        let providers = [];
+        let config = JSON.parse(localStorage.getItem('apex_config')) || null;
+
+        async function init() {
             lucide.createIcons();
+            if (!config) {
+                document.getElementById('setup-overlay').classList.remove('hidden');
+                return;
+            }
+            supabase = supabase.createClient(config.url, config.key);
             showView('dashboard');
-            renderProviders();
+            refreshData();
+        }
+
+        function saveConfig() {
+            const url = document.getElementById('db-url').value;
+            const key = document.getElementById('db-key').value;
+            if (!url || !key) return alert('Both fields required');
+            config = { url, key };
+            localStorage.setItem('apex_config', JSON.stringify(config));
+            location.reload();
+        }
+
+        async function refreshData() {
+            const sync = document.getElementById('sync-indicator');
+            sync.innerHTML = '<div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div> Syncing...';
+            
+            const { data, error } = await supabase.from('providers').select('*').order('created_at', { ascending: false });
+            if (!error) {
+                providers = data;
+                renderView();
+            }
+            sync.innerHTML = '<div class="w-2 h-2 rounded-full bg-emerald-500"></div> Cloud Connected';
+        }
+
+        async function saveProvider() {
+            const provider = {
+                name: document.getElementById('m-name').value,
+                specialty: document.getElementById('m-specialty').value,
+                state: document.getElementById('m-state').value,
+                npi: document.getElementById('m-npi').value,
+                status: document.getElementById('m-status').value
+            };
+            const { error } = await supabase.from('providers').insert([provider]);
+            if (!error) { closeModal(); refreshData(); }
         }
 
         function showView(view) {
+            window.currentView = view;
+            renderView();
+        }
+
+        function renderView() {
             const container = document.getElementById('content-view');
-            
-            // Update UI Sidebar
-            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
-            document.getElementById(`nav-${view}`).classList.add('active');
-
-            if (view === 'dashboard') {
+            if (window.currentView === 'dashboard') {
                 container.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-4 gap-6 mb-8">
                         <div class="glass p-6 rounded-2xl">
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Providers</p>
-                            <div class="flex items-end justify-between">
-                                <h3 class="text-3xl font-bold">142</h3>
-                                <span class="text-emerald-400 text-xs font-semibold flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3"></i> +12%</span>
-                            </div>
+                            <p class="text-slate-400 text-[10px] font-bold uppercase mb-2">Total Team Assets</p>
+                            <h3 class="text-3xl font-bold">${providers.length}</h3>
                         </div>
                         <div class="glass p-6 rounded-2xl">
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Recruitment Pipeline</p>
-                            <div class="flex items-end justify-between">
-                                <h3 class="text-3xl font-bold">28</h3>
-                                <span class="text-indigo-400 text-xs font-semibold">8 Active Screens</span>
-                            </div>
-                        </div>
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Credentialing</p>
-                            <div class="flex items-end justify-between">
-                                <h3 class="text-3xl font-bold">14</h3>
-                                <span class="text-amber-400 text-xs font-semibold">3 Expiring Soon</span>
-                            </div>
-                        </div>
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Avg. TAT (Hours)</p>
-                            <div class="flex items-end justify-between">
-                                <h3 class="text-3xl font-bold">0.8</h3>
-                                <span class="text-emerald-400 text-xs font-semibold">Optimal</span>
-                            </div>
+                            <p class="text-slate-400 text-[10px] font-bold uppercase mb-2">Active Reads</p>
+                            <h3 class="text-3xl font-bold text-emerald-400">${providers.filter(p => p.status === 'Active').length}</h3>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 glass p-8 rounded-3xl">
-                            <div class="flex items-center justify-between mb-8">
-                                <h2 class="text-xl font-bold">Recruitment Trends</h2>
-                                <select class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs">
-                                    <option>Last 6 Months</option>
-                                    <option>Year to Date</option>
-                                </select>
-                            </div>
-                            <canvas id="recruitmentChart" height="250"></canvas>
-                        </div>
-                        <div class="glass p-8 rounded-3xl">
-                            <h2 class="text-xl font-bold mb-6">Top Specialties</h2>
-                            <div class="space-y-6">
-                                ${['Neuroradiology', 'Musculoskeletal', 'Body Imaging', 'Cardiovascular'].map(spec => `
-                                    <div>
-                                        <div class="flex justify-between text-sm mb-2">
-                                            <span>${spec}</span>
-                                            <span class="text-slate-400">${Math.floor(Math.random() * 40) + 10}%</span>
-                                        </div>
-                                        <div class="w-full bg-slate-800 rounded-full h-1.5">
-                                            <div class="bg-indigo-500 h-1.5 rounded-full" style="width: ${Math.floor(Math.random() * 60) + 30}%"></div>
-                                        </div>
+                    <div class="glass p-8 rounded-3xl">
+                        <h2 class="text-xl font-bold mb-6">Recent Activity</h2>
+                        <div class="space-y-4">
+                            ${providers.slice(0, 5).map(p => `
+                                <div class="flex items-center justify-between p-4 bg-slate-900/30 rounded-xl">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold">${p.name[0]}</div>
+                                        <div><p class="font-bold text-sm">${p.name}</p><p class="text-[10px] text-slate-500">${p.specialty}</p></div>
                                     </div>
-                                `).join('')}
-                            </div>
+                                    <span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;
-                renderCharts();
-            } else if (view === 'directory') {
-                container.innerHTML = `
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold">Provider Directory</h2>
-                        <div class="flex gap-3">
-                            <button class="glass p-2 rounded-lg text-slate-400"><i data-lucide="filter" class="w-5 h-5"></i></button>
-                            <button class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2">
-                                <i data-lucide="plus" class="w-4 h-4"></i> Add Provider
-                            </button>
-                        </div>
-                    </div>
-                    <div class="glass rounded-3xl overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="bg-slate-900/50 border-b border-slate-800">
-                                    <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500">Provider Name</th>
-                                    <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500">Specialty</th>
-                                    <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500">State / NPI</th>
-                                    <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                                    <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="provider-list">
-                                <!-- Data injected here -->
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                renderProviders();
             } else {
                 container.innerHTML = `
-                    <div class="h-96 flex flex-col items-center justify-center glass rounded-3xl border-dashed border-2 border-slate-700">
-                        <i data-lucide="construction" class="w-12 h-12 text-slate-600 mb-4"></i>
-                        <h3 class="text-xl font-bold text-slate-400 uppercase tracking-widest">${view} View</h3>
-                        <p class="text-slate-500 mt-2">Module is currently being optimized for Apex workflow.</p>
+                    <div class="glass rounded-3xl overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-900/50">
+                                <tr>
+                                    <th class="p-5 text-[10px] font-bold text-slate-500 uppercase">Provider</th>
+                                    <th class="p-5 text-[10px] font-bold text-slate-500 uppercase">Details</th>
+                                    <th class="p-5 text-[10px] font-bold text-slate-500 uppercase">Status</th>
+                                    <th class="p-5 text-[10px] font-bold text-slate-500 uppercase text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${providers.map(p => `
+                                    <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
+                                        <td class="p-5">
+                                            <p class="font-bold text-sm">${p.name}</p>
+                                            <p class="text-[10px] text-slate-500">NPI: ${p.npi}</p>
+                                        </td>
+                                        <td class="p-5"><p class="text-sm">${p.specialty}</p><p class="text-[10px] text-slate-500">${p.state}</p></td>
+                                        <td class="p-5"><span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span></td>
+                                        <td class="p-5 text-right"><button class="text-slate-500 hover:text-white"><i data-lucide="edit-3" class="w-4 h-4"></i></button></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `;
             }
             lucide.createIcons();
         }
 
-        function renderProviders() {
-            const list = document.getElementById('provider-list');
-            if (!list) return;
-            list.innerHTML = providers.map(p => `
-                <tr class="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
-                    <td class="p-5">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-indigo-400 font-bold">
-                                ${p.name.split(' ').pop()[0]}
-                            </div>
-                            <div>
-                                <p class="font-semibold">${p.name}</p>
-                                <p class="text-xs text-slate-500">${p.email}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-5">
-                        <span class="text-sm font-medium text-slate-300">${p.specialty}</span>
-                    </td>
-                    <td class="p-5">
-                        <p class="text-sm">${p.state}</p>
-                        <p class="text-[10px] text-slate-500 font-mono uppercase">NPI: ${p.npi}</p>
-                    </td>
-                    <td class="p-5">
-                        <span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span>
-                    </td>
-                    <td class="p-5 text-right">
-                        <button class="text-slate-500 hover:text-white transition-colors"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-            lucide.createIcons();
+        function openModal(mode) {
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal-submit').onclick = saveProvider;
         }
 
-        function renderCharts() {
-            const ctx = document.getElementById('recruitmentChart');
-            if (!ctx) return;
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Sourced',
-                        data: [65, 78, 90, 85, 95, 110],
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Signed',
-                        data: [12, 19, 15, 22, 18, 25],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
-                    }
-                }
-            });
-        }
-
-        function exportData() {
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "Name,Specialty,State,NPI,Status\n"
-                + providers.map(p => `${p.name},${p.specialty},${p.state},${p.npi},${p.status}`).join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "apex_provider_data.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
         window.onload = init;
     </script>
