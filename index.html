@@ -1,10 +1,10 @@
-<!-- CRM Module Suite v4.2 Deployment -->
+<!-- CRM Module Suite v4.3 Deployment -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEX | Cloud CRM v4.2</title>
+    <title>APEX | Cloud CRM v4.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -47,7 +47,6 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
         <div class="glass p-8 rounded-3xl max-w-lg w-full space-y-6 animate-in">
             <div class="flex justify-between items-center">
@@ -71,6 +70,7 @@
                 <a href="#" onclick="showView('ppipeline')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-ppipeline"><i data-lucide="trello" class="w-4 h-4"></i><span class="text-sm">Recruitment Pipeline</span></a>
                 <a href="#" onclick="showView('skills')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-skills"><i data-lucide="grid" class="w-4 h-4"></i><span class="text-sm">Skills Matrix</span></a>
                 <a href="#" onclick="showView('licenses')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-licenses"><i data-lucide="award" class="w-4 h-4"></i><span class="text-sm">License Monitor</span></a>
+                <a href="#" onclick="showView('credentialing')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-credentialing"><i data-lucide="file-check" class="w-4 h-4"></i><span class="text-sm">Credentialing</span></a>
             </div>
             <div>
                 <p class="px-4 text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-4">Client CRM</p>
@@ -184,6 +184,7 @@
                 ppipeline: (el) => renderPipeline(el, providers, 'Provider Pipeline'),
                 skills: renderSkills,
                 licenses: renderLicenses,
+                credentialing: renderCredentialing,
                 clients: renderClients,
                 cpipeline: (el) => renderPipeline(el, clients, 'Client Pipeline'),
                 matching: renderMatching,
@@ -192,7 +193,7 @@
                 activity: renderActivity
             };
             if(views[window.currentView]) views[window.currentView](c);
-            else c.innerHTML = '<div class=\"p-20 text-center text-white/20 font-bold uppercase tracking-widest text-4xl\">Module Ready</div>';
+            else c.innerHTML = '<div class="p-20 text-center text-white/20 font-bold uppercase tracking-widest text-4xl">Module Ready</div>';
             if(window.lucide) lucide.createIcons();
         }
 
@@ -205,54 +206,82 @@
                     <div class="glass p-8 rounded-3xl"><p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Matches</p><h3 class="text-4xl font-bold text-cyan-400">${matches.length}</h3></div>
                 </div>
                 <div class="glass p-10 rounded-3xl text-center">
-                    <h2 class="text-xl font-bold mb-4 text-cyan-400">System Takeover v4.2 Active</h2>
+                    <h2 class="text-xl font-bold mb-4 text-cyan-400">System Takeover v4.3 Active</h2>
                     <p class="text-slate-400 max-w-2xl mx-auto">Database tables synchronized. Ready for data ingestion and automated physician matching.</p>
                 </div>
             `;
         }
 
         function renderPhysicians(c) {
-            c.innerHTML = `<div class="glass rounded-3xl overflow-hidden animate-in"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Name</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Specialty</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Status</th></tr>
-                ${providers.map(p => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-6 font-bold">${p.name}</td><td class="p-6">${p.specialty}</td><td class="p-6"><span class="status-badge bg-blue-500/20 text-blue-400">${p.status}</span></td></tr>`).join('')}
-            </table></div>`;
+            c.innerHTML = '<div class="glass rounded-3xl overflow-hidden animate-in"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Name</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Specialty</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Status</th></tr>' +
+            providers.map(p => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-6 font-bold">${p.name}</td><td class="p-6">${p.specialty}</td><td class="p-6"><span class="status-badge bg-blue-500/20 text-blue-400">${p.status}</span></td></tr>`).join('') +
+            '</table></div>';
         }
 
         function renderClients(c) {
-            c.innerHTML = `<div class="glass rounded-3xl overflow-hidden animate-in"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Account Name</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Location</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Status</th></tr>
-                ${clients.map(cl => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-6 font-bold">${cl.name}</td><td class="p-6">${cl.location}</td><td class="p-6"><span class="status-badge bg-amber-500/20 text-amber-400">${cl.status}</span></td></tr>`).join('')}
-            </table></div>`;
+            c.innerHTML = '<div class="glass rounded-3xl overflow-hidden animate-in"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Account Name</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Location</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Status</th></tr>' +
+            clients.map(cl => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-6 font-bold">${cl.name}</td><td class="p-6">${cl.location}</td><td class="p-6"><span class="status-badge bg-amber-500/20 text-amber-400">${cl.status}</span></td></tr>`).join('') +
+            '</table></div>';
         }
 
         function renderPipeline(c, data, title) {
             const stages = ['Prospect', 'Recruiting', 'Pending', 'Active'];
-            c.innerHTML = `<h2 class="text-xl font-bold mb-6">${title}</h2><div class="grid grid-cols-4 gap-6 h-full animate-in">
-                ${stages.map(s => `<div class="flex flex-col gap-4"><p class="text-[10px] font-bold text-white/40 uppercase">${s}</p><div class="min-h-[400px] bg-white/5 rounded-2xl p-4 space-y-4">
-                    ${data.filter(x => x.status === s).map(x => `<div class="glass p-4 rounded-xl text-xs font-bold">${x.name}</div>`).join('')}
-                </div></div>`).join('')}
-            </div>`;
+            c.innerHTML = `<h2 class="text-xl font-bold mb-6">${title}</h2><div class="grid grid-cols-4 gap-6 h-full animate-in">` +
+            stages.map(s => `<div class="flex flex-col gap-4"><p class="text-[10px] font-bold text-white/40 uppercase">${s}</p><div class="min-h-[400px] bg-white/5 rounded-2xl p-4 space-y-4">` +
+            data.filter(x => x.status === s).map(x => `<div class="glass p-4 rounded-xl text-xs font-bold">${x.name}</div>`).join('') +
+            '</div></div>').join('') + '</div>';
         }
 
         function renderSkills(c) {
-            c.innerHTML = `<div class="glass p-10 rounded-[2rem] animate-in"><h2 class="text-xl font-bold mb-6">Skills Matrix</h2><div class="overflow-hidden rounded-2xl border border-white/5"><table class="w-full text-left">
-                <tr class="bg-white/5 border-b border-white/5"><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Provider</th><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Specialty</th><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Proficiency</th></tr>
-                ${providers.map(p => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-4 font-bold text-sm">${p.name}</td><td class="p-4 text-xs text-slate-400">${p.specialty}</td><td class="p-4"><div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden"><div class="bg-cyan-500 h-full w-[${Math.floor(Math.random()*40)+60}%]"></div></div></td></tr>`).join('')}
-            </table></div></div>`;
+            c.innerHTML = '<div class="glass p-10 rounded-[2rem] animate-in"><h2 class="text-xl font-bold mb-6">Skills Matrix</h2><div class="overflow-hidden rounded-2xl border border-white/5"><table class="w-full text-left">' +
+            '<tr class="bg-white/5 border-b border-white/5"><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Provider</th><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Specialty</th><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Proficiency</th></tr>' +
+            providers.map(p => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-4 font-bold text-sm">${p.name}</td><td class="p-4 text-xs text-slate-400">${p.specialty}</td><td class="p-4"><div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden"><div class="bg-cyan-500 h-full w-[${Math.floor(Math.random()*40)+60}%]"></div></div></td></tr>`).join('') +
+            '</table></div></div>';
         }
 
         function renderLicenses(c) {
-            c.innerHTML = `<div class="glass p-10 rounded-[2rem] animate-in"><h2 class="text-xl font-bold mb-6 text-amber-400">License Monitor</h2><div class="grid grid-cols-1 gap-4">
-                ${providers.map(p => `<div class="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/5"><div class="flex items-center gap-4"><div class="bg-amber-500/20 p-3 rounded-full"><i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i></div><div><p class="font-bold">${p.name}</p><p class="text-[10px] text-slate-500 uppercase">License #9283 - Active</p></div></div><div class="text-right"><p class="text-[10px] text-slate-500 uppercase mb-1">Expires In</p><p class="text-xs font-bold text-emerald-400">${Math.floor(Math.random()*300)} Days</p></div></div>`).join('')}
-            </div></div>`;
+            c.innerHTML = '<div class="glass p-10 rounded-[2rem] animate-in"><h2 class="text-xl font-bold mb-6 text-amber-400">License Monitor</h2><div class="grid grid-cols-1 gap-4">' +
+            providers.map(p => `<div class="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/5"><div class="flex items-center gap-4"><div class="bg-amber-500/20 p-3 rounded-full"><i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i></div><div><p class="font-bold">${p.name}</p><p class="text-[10px] text-slate-500 uppercase">License #9283 - Active</p></div></div><div class="text-right"><p class="text-[10px] text-slate-500 uppercase mb-1">Expires In</p><p class="text-xs font-bold text-emerald-400">${Math.floor(Math.random()*300)} Days</p></div></div>`).join('') +
+            '</div></div>';
+        }
+
+        function renderCredentialing(c) {
+            c.innerHTML = `
+            <div class="glass p-10 rounded-[2rem] animate-in">
+                <h2 class="text-xl font-bold mb-6 text-blue-400">Credentialing Workflow</h2>
+                <div class="space-y-4">
+                    ${providers.map(p => `
+                    <div class="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-blue-500/20 p-3 rounded-full">
+                                <i data-lucide="clipboard-list" class="w-5 h-5 text-blue-400"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold">${p.name}</p>
+                                <p class="text-[10px] text-slate-500 uppercase">Packet Status: Under Review</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="status-badge bg-blue-500/20 text-blue-400">Packet Sent</span>
+                            <span class="status-badge bg-slate-500/20 text-slate-500">Privileges Pending</span>
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>`;
         }
 
         function renderMatching(c) {
-            c.innerHTML = `<div class="space-y-6 animate-in">
-                <div class="glass p-10 rounded-[2rem] flex items-center justify-between"><div><h2 class="text-2xl font-bold mb-2">Matching Intelligence</h2><p class="text-slate-500">AI-driven physician-to-facility matching.</p></div>
-                <button onclick="runMatch()" class="bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-2xl font-bold transition-all">Run Match Engine</button></div>
-                <div id="match-results" class="grid grid-cols-2 gap-6">
-                    ${matches.length ? matches.map(m => `<div class="glass p-8 rounded-3xl border-l-4 border-teal-500"><p class="text-[10px] font-bold text-slate-500 uppercase mb-4">Confirmed Match</p><div class="flex items-center gap-4"><div><p class="font-bold">${m.provider_name}</p><p class="text-xs text-slate-500">Matched to ${m.client_name}</p></div></div></div>`).join('') : '<p class="text-white/20 p-10 col-span-2 text-center">No active matches. Run engine to calculate.</p>'}
+            c.innerHTML = `
+                <div class="space-y-6 animate-in">
+                    <div class="glass p-10 rounded-[2rem] flex items-center justify-between">
+                        <div><h2 class="text-2xl font-bold mb-2">Matching Intelligence</h2><p class="text-slate-500">AI-driven physician-to-facility matching.</p></div>
+                        <button onclick="runMatch()" class="bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-2xl font-bold transition-all">Run Match Engine</button>
+                    </div>
+                    <div id="match-results" class="grid grid-cols-2 gap-6">
+                        ${matches.length ? matches.map(m => `<div class="glass p-8 rounded-3xl border-l-4 border-teal-500"><p class="text-[10px] font-bold text-slate-500 uppercase mb-4">Confirmed Match</p><div class="flex items-center gap-4"><div><p class="font-bold">${m.provider_name}</p><p class="text-xs text-slate-500">Matched to ${m.client_name}</p></div></div></div>`).join('') : '<p class="text-white/20 p-10 col-span-2 text-center">No active matches. Run engine to calculate.</p>'}
+                    </div>
                 </div>
-            </div>`;
+            `;
         }
 
         function runMatch() {
@@ -263,27 +292,37 @@
         }
 
         function renderBooking(c) {
-            c.innerHTML = `<div class="glass p-10 rounded-[2rem] text-center animate-in">
-                <h2 class="text-2xl font-bold mb-6">Shift Booking</h2>
-                <div class="grid grid-cols-7 gap-2">
-                    ${['M','T','W','T','F','S','S'].map(d => `<div class="p-4 bg-white/5 rounded-xl text-xs font-bold text-slate-500">${d}</div>`).join('')}
-                    ${Array.from({length: 28}).map((_, i) => `<div onclick="this.classList.toggle('bg-rose-500/20')" class="aspect-square bg-white/5 rounded-xl border border-white/5 hover:border-rose-500/30 cursor-pointer transition-all flex items-center justify-center text-[10px] text-white/20">${i+1}</div>`).join('')}
+            c.innerHTML = `
+                <div class="glass p-10 rounded-[2rem] text-center animate-in">
+                    <h2 class="text-2xl font-bold mb-6">Shift Booking</h2>
+                    <div class="grid grid-cols-7 gap-2">
+                        ${['M','T','W','T','F','S','S'].map(d => `<div class="p-4 bg-white/5 rounded-xl text-xs font-bold text-slate-500">${d}</div>`).join('')}
+                        ${Array.from({length: 28}).map((_, i) => `<div onclick="this.classList.toggle('bg-rose-500/20')" class="aspect-square bg-white/5 rounded-xl border border-white/5 hover:border-rose-500/30 cursor-pointer transition-all flex items-center justify-center text-[10px] text-white/20">${i+1}</div>`).join('')}
+                    </div>
                 </div>
-            </div>`;
+            `;
         }
 
         function renderFinance(c) {
-            c.innerHTML = `<div class="glass p-10 rounded-[2rem] animate-in"><div class="flex justify-between items-center mb-10"><h2 class="text-xl font-bold">Invoicing</h2><p class="text-emerald-400 font-bold">$2.4M Q3 Revenue</p></div>
-                <div class="space-y-4">
-                    ${clients.map(cl => `<div class="p-6 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between"><div><p class="font-bold">${cl.name}</p><p class="text-[10px] text-slate-500 uppercase">INV-${Math.floor(Math.random()*10000)}</p></div><span class="status-badge bg-emerald-500/20 text-emerald-400">Paid</span></div>`).join('')}
+            c.innerHTML = `
+                <div class="glass p-10 rounded-[2rem] animate-in">
+                    <div class="flex justify-between items-center mb-10"><h2 class="text-xl font-bold">Invoicing</h2><p class="text-emerald-400 font-bold">$2.4M Q3 Revenue</p></div>
+                    <div class="space-y-4">
+                        ${clients.map(cl => `<div class="p-6 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between"><div><p class="font-bold">${cl.name}</p><p class="text-[10px] text-slate-500 uppercase">INV-${Math.floor(Math.random()*10000)}</p></div><span class="status-badge bg-emerald-500/20 text-emerald-400">Paid</span></div>`).join('')}
+                    </div>
                 </div>
-            </div>`;
+            `;
         }
 
         function renderActivity(c) {
-            c.innerHTML = `<h2 class="text-xl font-bold mb-6">Activity Log</h2><div class="glass rounded-3xl p-6 space-y-4 animate-in">
-                <div class="flex gap-4 items-center p-4 bg-white/5 rounded-2xl border-l-4 border-cyan-500"><div><p class="text-sm font-bold">System Upgrade v4.2 Complete</p><p class="text-[10px] text-slate-500 uppercase">Just Now • System</p></div></div>
-            </div>`;
+            c.innerHTML = `
+                <h2 class="text-xl font-bold mb-6">Activity Log</h2>
+                <div class="glass rounded-3xl p-6 space-y-4 animate-in">
+                    <div class="flex gap-4 items-center p-4 bg-white/5 rounded-2xl border-l-4 border-cyan-500">
+                        <div><p class="text-sm font-bold">System Upgrade v4.3 Complete</p><p class="text-[10px] text-slate-500 uppercase">Just Now • System</p></div>
+                    </div>
+                </div>
+            `;
         }
 
         function openModal(type) {
@@ -293,10 +332,10 @@
             m.classList.remove('hidden');
             if(type === 'provider') {
                 t.innerText = 'Add New Physician';
-                b.innerHTML = `<input id="p-name" placeholder="Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><input id="p-spec" placeholder="Specialty" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><button onclick="saveEntry('provider')" class="w-full bg-cyan-600 py-3 rounded-xl font-bold">Save Provider</button>`;
+                b.innerHTML = '<input id="p-name" placeholder="Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><input id="p-spec" placeholder="Specialty" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><button onclick="saveEntry(\'provider\')" class="w-full bg-cyan-600 py-3 rounded-xl font-bold">Save Provider</button>';
             } else {
                 t.innerText = 'Add New Client Account';
-                b.innerHTML = `<input id="c-name" placeholder="Facility Name" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><input id="c-loc" placeholder="Location" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><button onclick="saveEntry('client')" class="w-full bg-amber-600 py-3 rounded-xl font-bold">Save Client</button>`;
+                b.innerHTML = '<input id="c-name" placeholder="Facility Name" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><input id="c-loc" placeholder="Location" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm"><button onclick="saveEntry(\'client\')" class="w-full bg-amber-600 py-3 rounded-xl font-bold">Save Client</button>';
             }
         }
 
