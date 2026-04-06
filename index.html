@@ -105,7 +105,18 @@
  </main>
  <script>
  let db;
- let providers = [], clients = [], requests = [], matches = [], logs = [];
+ let providers = [
+  {id: 1, name: 'Dr. Abhi Aggarwal', specialty: 'Radiology', location: 'Palm Beach, FL', status: 'Active'},
+  {id: 2, name: 'Dr. Abieyuwa Eweka', specialty: 'Radiology', location: 'New York, NY', status: 'Active'},
+  {id: 3, name: 'Dr. Achuta Guddati', specialty: 'Oncology', location: 'Jacksonville, FL', status: 'Qualified'},
+  {id: 4, name: 'Dr. Adeel Shahid', specialty: 'Radiology', location: 'Miami, FL', status: 'Qualified'},
+  {id: 5, name: 'Dr. Ainsley Freshour', specialty: 'General Surgery', location: 'Tampa, FL', status: 'Qualified'},
+  {id: 6, name: 'Dr. Albert Yang', specialty: 'Radiology', location: 'San Diego, CA', status: 'Qualified'},
+  {id: 7, name: 'Dr. Amir Salem', specialty: 'Interventional Radiology', location: 'Los Angeles, CA', status: 'Qualified'},
+  {id: 8, name: 'Dr. Anurag Arora', specialty: 'Radiology', location: 'Buffalo, NY', status: 'Active'},
+  {id: 9, name: 'Dr. Bilal Ahmed', specialty: 'Radiology', location: 'Chicago, IL', status: 'Active'},
+  {id: 10, name: 'Dr. Jonathan Bold', specialty: 'Radiology', location: 'California', status: 'Active'}
+], clients = [], requests = [], matches = [], logs = [];
  let config = JSON.parse(localStorage.getItem("apex_config"));
  async function init() {
  lucide.createIcons();
