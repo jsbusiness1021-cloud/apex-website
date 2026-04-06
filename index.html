@@ -117,8 +117,7 @@
   {id: 9, name: 'Dr. Bilal Ahmed', specialty: 'Radiology', location: 'Chicago, IL', status: 'Active'},
   {id: 10, name: 'Dr. Jonathan Bold', specialty: 'Radiology', location: 'California', status: 'Active'}
 ], clients = [], requests = [], matches = [], logs = [];
- let config = JSON.parse(localStorage.getItem("apex_config"));
- async function init() {
+    useDemoMode(); async function init() {
  lucide.createIcons();
  if(!config) {
  //document.getElementById('setup-overlay').classList.remove('hidden');
