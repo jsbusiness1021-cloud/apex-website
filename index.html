@@ -81,11 +81,6 @@
 
         async function init() {
             lucide.createIcons();
-            if (!config) {
-                // If no config, we expect the user to have run the setup modal or provide keys
-                // For this takeover, we assume credentials exist in storage or we provide a fallback
-                // db = supabase.createClient('URL', 'KEY');
-            }
             if(config) {
                 db = supabase.createClient(config.url, config.key);
                 await refreshData();
@@ -122,9 +117,13 @@
             if(window.currentView === 'dashboard') renderDashboard(c);
             else if(window.currentView === 'physicians') renderPhysicians(c);
             else if(window.currentView === 'ppipeline') renderPipeline(c, providers);
+            else if(window.currentView === 'skills') renderSkills(c);
+            else if(window.currentView === 'licenses') renderLicenses(c);
             else if(window.currentView === 'clients') renderClients(c);
             else if(window.currentView === 'cpipeline') renderPipeline(c, clients, 'Client Pipeline');
             else if(window.currentView === 'matching') renderMatching(c);
+            else if(window.currentView === 'booking') renderBooking(c);
+            else if(window.currentView === 'finance') renderFinance(c);
             else if(window.currentView === 'activity') renderActivity(c);
             else c.innerHTML = '<div class="p-20 text-center text-white/20 font-bold uppercase tracking-widest text-4xl">Module Ready</div>';
             if(window.lucide) lucide.createIcons();
@@ -140,7 +139,7 @@
                 </div>
                 <div class="glass p-10 rounded-3xl text-center">
                     <h2 class="text-xl font-bold mb-4 text-cyan-400">System Takeover v4.2 Active</h2>
-                    <p class="text-slate-400 max-w-2xl mx-auto">Database tables synchronized. Ready for data ingestion for 200+ employees.</p>
+                    <p class="text-slate-400 max-w-2xl mx-auto">Database tables synchronized. Ready for data ingestion and automated physician matching.</p>
                 </div>
             `;
         }
@@ -158,12 +157,28 @@
             c.innerHTML = \`<h2 class="text-xl font-bold mb-6">\${title}</h2><div class="grid grid-cols-4 gap-6 h-full animate-in"> \${stages.map(s => \`<div class="flex flex-col gap-4"><p class="text-[10px] font-bold text-white/40 uppercase">\${s}</p><div class="min-h-[400px] bg-white/5 rounded-2xl p-4 space-y-4"> \${data.filter(x => x.status === s).map(x => \`<div class="glass p-4 rounded-xl text-xs font-bold">\${x.name}</div>\`).join('')} </div></div>\`).join('')} </div>\`;
         }
 
+        function renderSkills(c) {
+            c.innerHTML = \`<div class="glass p-10 rounded-[2rem] animate-in"><h2 class="text-xl font-bold mb-6">Skills Matrix</h2><div class="overflow-hidden rounded-2xl border border-white/5"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Provider</th><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Skills</th><th class="p-4 text-[10px] font-bold uppercase text-slate-500">Proficiency</th></tr> \${providers.map(p => \`<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-4 font-bold text-sm">\${p.name}</td><td class="p-4 text-xs text-slate-400">\${p.specialty || 'General'}</td><td class="p-4"><div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden"><div class="bg-cyan-500 h-full w-[85%]"></div></div></td></tr>\`).join('')} </table></div></div>\`;
+        }
+
+        function renderLicenses(c) {
+            c.innerHTML = \`<div class="glass p-10 rounded-[2rem] animate-in"><h2 class="text-xl font-bold mb-6 text-amber-400">License Monitor</h2><div class="grid grid-cols-1 gap-4"> \${providers.map(p => \`<div class="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-amber-500/30 transition-all"><div class="flex items-center gap-4"><div class="bg-amber-500/20 p-3 rounded-full"><i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i></div><div><p class="font-bold">\${p.name}</p><p class="text-[10px] text-slate-500 uppercase tracking-widest">Medical License #29384 • Active</p></div></div><div class="text-right"><p class="text-[10px] text-slate-500 uppercase mb-1">Expires In</p><p class="text-xs font-bold text-emerald-400">245 Days</p></div></div>\`).join('')} </div></div>\`;
+        }
+
         function renderMatching(c) {
-            c.innerHTML = \`<div class="glass p-10 rounded-[2rem] text-center animate-in"><i data-lucide="zap" class="w-12 h-12 text-teal-400 mx-auto mb-6"></i><h2 class="text-2xl font-bold mb-2">Matching Engine</h2><p class="text-slate-500">Analyze client requests against provider credentials and availability.</p></div>\`;
+            c.innerHTML = \`<div class="space-y-6 animate-in"><div class="glass p-10 rounded-[2rem] flex items-center justify-between"><div><h2 class="text-2xl font-bold mb-2">Matching Intelligence</h2><p class="text-slate-500">AI-driven physician-to-facility matching based on skills and proximity.</p></div><button class="bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-teal-900/20">Run Match Engine</button></div><div class="grid grid-cols-2 gap-6"><div class="glass p-8 rounded-3xl border-l-4 border-teal-500"><p class="text-[10px] font-bold text-slate-500 uppercase mb-4">Top Match Recommendation</p><div class="flex items-center gap-4"><div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center font-bold text-teal-400">98%</div><div><p class="font-bold">\${providers[0]?.name || 'Dr. Smith'}</p><p class="text-xs text-slate-500">Matched to \${clients[0]?.name || 'Apex Health'}</p></div></div></div></div></div>\`;
+        }
+
+        function renderBooking(c) {
+            c.innerHTML = \`<div class="glass p-10 rounded-[2rem] text-center animate-in"><div class="bg-rose-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="calendar-check" class="w-8 h-8 text-rose-400"></i></div><h2 class="text-2xl font-bold mb-2">Shift Booking</h2><p class="text-slate-500 mb-8 max-w-md mx-auto">Manage shifts and rotations.</p><div class="grid grid-cols-7 gap-2"> \${['M','T','W','T','F','S','S'].map(d => \`<div class="p-4 bg-white/5 rounded-xl text-xs font-bold text-slate-500">\${d}</div>\`).join('')} \${Array.from({length: 28}).map((_, i) => \`<div class="aspect-square bg-white/5 rounded-xl border border-white/5 hover:border-rose-500/30 cursor-pointer transition-all flex items-center justify-center text-[10px] text-white/20">\${i+1}</div>\`).join('')} </div></div>\`;
+        }
+
+        function renderFinance(c) {
+            c.innerHTML = \`<div class="glass p-10 rounded-[2rem] animate-in"><div class="flex justify-between items-center mb-10"><h2 class="text-xl font-bold">Invoicing</h2><div class="text-right"><p class="text-[10px] text-slate-500 uppercase">Q3 Revenue</p><p class="text-xl font-bold text-emerald-400">$2.4M</p></div></div><div class="space-y-4"> \${clients.slice(0, 5).map(cl => \`<div class="p-6 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between"><div class="flex items-center gap-4"><i data-lucide="file-text" class="w-5 h-5 text-slate-400"></i><div><p class="font-bold">\${cl.name}</p><p class="text-[10px] text-slate-500 uppercase">Invoice #INV-00\${Math.floor(Math.random()*900)}</p></div></div><span class="status-badge bg-emerald-500/20 text-emerald-400">Paid</span></div>\`).join('')} </div></div>\`;
         }
 
         function renderActivity(c) {
-            c.innerHTML = \`<h2 class="text-xl font-bold mb-6">Activity Log</h2><div class="glass rounded-3xl p-6 space-y-4 animate-in"> <div class="flex gap-4 items-center p-4 bg-white/5 rounded-2xl border-l-4 border-cyan-500"><div class="bg-cyan-500/20 p-3 rounded-full"><i data-lucide="refresh-cw" class="w-4 h-4 text-cyan-400"></i></div><div><p class="text-sm font-bold">System Upgrade to v4.2</p><p class="text-[10px] text-slate-500 uppercase">Just Now • System</p></div></div> </div>\`;
+            c.innerHTML = \`<h2 class="text-xl font-bold mb-6">Activity Log</h2><div class="glass rounded-3xl p-6 space-y-4 animate-in"><div class="flex gap-4 items-center p-4 bg-white/5 rounded-2xl border-l-4 border-cyan-500"><div class="bg-cyan-500/20 p-3 rounded-full"><i data-lucide="refresh-cw" class="w-4 h-4 text-cyan-400"></i></div><div><p class="text-sm font-bold">System Upgrade to v4.2</p><p class="text-[10px] text-slate-500 uppercase">Just Now • System</p></div></div></div>\`;
         }
 
         function openModal(type) {
