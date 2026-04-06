@@ -1,10 +1,10 @@
-<!-- CRM Module Suite v4.3 Deployment -->
+<!-- CRM Module Suite v4.4 Deployment -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEX | Cloud CRM v4.3</title>
+    <title>APEX | Cloud CRM v4.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -71,6 +71,7 @@
                 <a href="#" onclick="showView('skills')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-skills"><i data-lucide="grid" class="w-4 h-4"></i><span class="text-sm">Skills Matrix</span></a>
                 <a href="#" onclick="showView('licenses')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-licenses"><i data-lucide="award" class="w-4 h-4"></i><span class="text-sm">License Monitor</span></a>
                 <a href="#" onclick="showView('credentialing')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-credentialing"><i data-lucide="file-check" class="w-4 h-4"></i><span class="text-sm">Credentialing</span></a>
+                <a href="#" onclick="showView('onboarding')" class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:text-white transition-all" id="nav-onboarding"><i data-lucide="user-plus" class="w-4 h-4"></i><span class="text-sm">Onboarding Tracker</span></a>
             </div>
             <div>
                 <p class="px-4 text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-4">Client CRM</p>
@@ -130,9 +131,16 @@
         function useDemoMode() {
             document.getElementById('setup-overlay').classList.add('hidden');
             providers = [
-                {id: 1, name: 'Dr. Sarah Chen', specialty: 'Radiology', status: 'Active'},
-                {id: 2, name: 'Dr. Michael Ross', specialty: 'Cardiology', status: 'Recruiting'},
-                {id: 3, name: 'Dr. Elena Vance', specialty: 'Radiology', status: 'Pending'}
+                {id: 1, name: 'Mohammed Bermo', specialty: 'Radiology', status: 'Active', location: 'Roanoke, VA', onboarding: 100},
+                {id: 2, name: 'Kirti Kulkarni', specialty: 'Radiology', status: 'Recruiting', location: 'Chicago, IL', onboarding: 25},
+                {id: 3, name: 'Ana Rosa', specialty: 'Radiology', status: 'Pending', location: 'Omaha, NE', onboarding: 60},
+                {id: 4, name: 'Denis Hoa', specialty: 'Radiology', status: 'Active', location: 'France', onboarding: 100},
+                {id: 5, name: 'Joost Nederend', specialty: 'Radiology', status: 'Pending', location: 'Netherlands', onboarding: 40},
+                {id: 6, name: 'Joshua Blunck', specialty: 'Radiology', status: 'Recruiting', location: 'United States', onboarding: 10},
+                {id: 7, name: 'Antoine Malrait', specialty: 'Radiology', status: 'Active', location: 'France', onboarding: 100},
+                {id: 8, name: 'Roderick Zalamea', specialty: 'Radiology', status: 'Prospect', location: 'Madison, AL', onboarding: 0},
+                {id: 9, name: 'Julien Rousseau', specialty: 'Radiology', status: 'Active', location: 'France', onboarding: 100},
+                {id: 10, name: 'Adam Yen', specialty: 'Radiology', status: 'Pending', location: 'San Francisco, CA', onboarding: 75}
             ];
             clients = [
                 {id: 1, name: 'Mercy General', location: 'New York', status: 'Active'},
@@ -185,6 +193,7 @@
                 skills: renderSkills,
                 licenses: renderLicenses,
                 credentialing: renderCredentialing,
+                onboarding: renderOnboarding,
                 clients: renderClients,
                 cpipeline: (el) => renderPipeline(el, clients, 'Client Pipeline'),
                 matching: renderMatching,
@@ -206,15 +215,15 @@
                     <div class="glass p-8 rounded-3xl"><p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Matches</p><h3 class="text-4xl font-bold text-cyan-400">${matches.length}</h3></div>
                 </div>
                 <div class="glass p-10 rounded-3xl text-center">
-                    <h2 class="text-xl font-bold mb-4 text-cyan-400">System Takeover v4.3 Active</h2>
-                    <p class="text-slate-400 max-w-2xl mx-auto">Database tables synchronized. Ready for data ingestion and automated physician matching.</p>
+                    <h2 class="text-xl font-bold mb-4 text-cyan-400">System Takeover v4.4 Active</h2>
+                    <p class="text-slate-400 max-w-2xl mx-auto">Apollo data integrated. Module 6 Onboarding Tracker initialized.</p>
                 </div>
             `;
         }
 
         function renderPhysicians(c) {
-            c.innerHTML = '<div class="glass rounded-3xl overflow-hidden animate-in"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Name</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Specialty</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Status</th></tr>' +
-            providers.map(p => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-6 font-bold">${p.name}</td><td class="p-6">${p.specialty}</td><td class="p-6"><span class="status-badge bg-blue-500/20 text-blue-400">${p.status}</span></td></tr>`).join('') +
+            c.innerHTML = '<div class="glass rounded-3xl overflow-hidden animate-in"><table class="w-full text-left"><tr class="bg-white/5 border-b border-white/5"><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Name</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Specialty</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Location</th><th class="p-6 text-[10px] font-bold uppercase text-slate-500">Status</th></tr>' +
+            providers.map(p => `<tr class="border-b border-white/5 hover:bg-white/5"><td class="p-6 font-bold">${p.name}</td><td class="p-6">${p.specialty}</td><td class="p-6 text-slate-400 text-sm">${p.location || 'N/A'}</td><td class="p-6"><span class="status-badge bg-blue-500/20 text-blue-400">${p.status}</span></td></tr>`).join('') +
             '</table></div>';
         }
 
@@ -270,6 +279,45 @@
             </div>`;
         }
 
+        function renderOnboarding(c) {
+            c.innerHTML = `
+            <div class="glass p-10 rounded-[2rem] animate-in">
+                <h2 class="text-xl font-bold mb-6 text-emerald-400">Onboarding Tracker</h2>
+                <div class="space-y-6">
+                    ${providers.map(p => `
+                    <div class="glass p-6 rounded-2xl border border-white/5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-emerald-500/20 p-3 rounded-full">
+                                    <i data-lucide="user-check" class="w-5 h-5 text-emerald-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold">${p.name}</p>
+                                    <p class="text-[10px] text-slate-500 uppercase">${p.location || 'Global'}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-500 uppercase mb-1">Overall Progress</p>
+                                <p class="text-xs font-bold text-emerald-400">${p.onboarding}%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-4">
+                            <div class="bg-emerald-500 h-full transition-all duration-1000" style="width: ${p.onboarding}%"></div>
+                        </div>
+                        <div class="grid grid-cols-5 gap-2">
+                            ${['Docs', 'Tech', 'Cred', 'Training', 'Live'].map((step, i) => {
+                                const active = (p.onboarding / 20) > i;
+                                return `<div class="flex flex-col items-center gap-1">
+                                    <div class="w-2 h-2 rounded-full ${active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-white/10'}"></div>
+                                    <span class="text-[8px] uppercase font-bold ${active ? 'text-white' : 'text-slate-600'}">${step}</span>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+        }
+
         function renderMatching(c) {
             c.innerHTML = `
                 <div class="space-y-6 animate-in">
@@ -319,7 +367,7 @@
                 <h2 class="text-xl font-bold mb-6">Activity Log</h2>
                 <div class="glass rounded-3xl p-6 space-y-4 animate-in">
                     <div class="flex gap-4 items-center p-4 bg-white/5 rounded-2xl border-l-4 border-cyan-500">
-                        <div><p class="text-sm font-bold">System Upgrade v4.3 Complete</p><p class="text-[10px] text-slate-500 uppercase">Just Now • System</p></div>
+                        <div><p class="text-sm font-bold">System Upgrade v4.4 Complete</p><p class="text-[10px] text-slate-500 uppercase">Just Now • System</p></div>
                     </div>
                 </div>
             `;
@@ -346,7 +394,7 @@
                 const name = document.getElementById('p-name').value;
                 const specialty = document.getElementById('p-spec').value;
                 if(db) await db.from('providers').insert([{name, specialty, status: 'Active'}]);
-                else providers.push({id: Date.now(), name, specialty, status: 'Active'});
+                else providers.push({id: Date.now(), name, specialty, status: 'Active', location: 'Manual Entry', onboarding: 0});
             } else {
                 const name = document.getElementById('c-name').value;
                 const location = document.getElementById('c-loc').value;
