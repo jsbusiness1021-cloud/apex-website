@@ -121,7 +121,7 @@
  async function init() {
  lucide.createIcons();
  if(!config) {
- document.getElementById('setup-overlay').classList.remove('hidden');
+ //document.getElementById('setup-overlay').classList.remove('hidden');
  } else {
  try {
  db = supabase.createClient(config.url, config.key);
