@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX | Cloud CRM v4.5</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-text"><span class="apex">APEX</span><span class="crm">CRM</span></span>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-header">CORE SYSTEM</span>
+            <a href="index.html" id="nav-dashboard">Dashboard</a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-header">PROVIDER CRM</span>
+            <a href="providers.html" id="nav-physicians" class="active">Providers</a>
+            <a href="#" id="nav-ppipeline">Recruitment Pipeline</a>
+            <a href="#" id="nav-skills">Skills Matrix</a>
+            <a href="#" id="nav-licenses">License Monitor</a>
+            <a href="#" id="nav-credentialing">Credentialing</a>
+            <a href="#" id="nav-onboarding">Onboarding Tracker</a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-header">CLIENT CRM</span>
+            <a href="#" id="nav-clients">Client Accounts</a>
+            <a href="#" id="nav-cpipeline">Client Pipeline</a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-header">MATCHING</span>
+            <a href="#" id="nav-matching">Matching & Proposals</a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-header">OPERATIONS</span>
+            <a href="#" id="nav-booking">Shift Booking</a>
+            <a href="#" id="nav-finance">Invoicing</a>
+            <a href="#" id="nav-activity">Activity Log</a>
+        </div>
+
+        <button class="database-config">DATABASE CONFIG</button>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <input type="text" class="search-bar" placeholder="Global search...">
+            <div class="header-buttons">
+                <button class="provider-btn">Provider</button>
+                <button class="client-btn">Client</button>
+            </div>
+        </header>
+
+        <div id="content-view">
+            <div class="providers-section">
+                <div class="providers-header">
+                    <h2>Provider Management</h2>
+                    <button class="btn-primary" id="add-provider-btn">+ Add Provider</button>
+                </div>
+
+                <div class="filter-section">
+                    <input type="text" class="filter-input" id="search-providers" placeholder="Search providers...">
+                    <select class="filter-select" id="filter-specialty">
+                        <option value="">All Specialties</option>
+                        <option value="Emergency Medicine">Emergency Medicine</option>
+                        <option value="Family Medicine">Family Medicine</option>
+                        <option value="Internal Medicine">Internal Medicine</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Anesthesiology">Anesthesiology</option>
+                    </select>
+                    <select class="filter-select" id="filter-status">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+
+                <div class="providers-grid" id="providers-grid">
+                    <!-- Providers will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="provider-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Provider Details</h2>
+            <form id="provider-form">
+                <div class="form-group">
+                    <label for="provider-name">Name:</label>
+                    <input type="text" id="provider-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="provider-specialty">Specialty:</label>
+                    <select id="provider-specialty" required>
+                        <option value="">Select Specialty</option>
+                        <option value="Emergency Medicine">Emergency Medicine</option>
+                        <option value="Family Medicine">Family Medicine</option>
+                        <option value="Internal Medicine">Internal Medicine</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Anesthesiology">Anesthesiology</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="provider-email">Email:</label>
+                    <input type="email" id="provider-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="provider-phone">Phone:</label>
+                    <input type="tel" id="provider-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="provider-license">License Number:</label>
+                    <input type="text" id="provider-license" required>
+                </div>
+                <div class="form-group">
+                    <label for="provider-status">Status:</label>
+                    <select id="provider-status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary">Save Provider</button>
+                    <button type="button" class="btn-secondary" id="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="providers.js"></script>
+</body>
+</html>
